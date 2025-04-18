@@ -1,0 +1,177 @@
+---
+title: "P8 - Data gathering"
+author: "Laust Visby Andreasen"
+date: "2024-03-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(jsonlite)
+library(tidyverse)
+```
+Maturity times UNIX
+dato   = Unix timestamp
+tradeday = 1670274000
+
+230106 = 1673038800
+230217 = 1676667600
+230317 = 1679086800
+230421 = 1682107200
+230519 = 1684526400
+230616 = 1686945600
+230721 = 1689969600
+230915 = 1694808000
+
+```{r}
+APIstock <- "https://api.polygon.io/v2/aggs/ticker/O:AAPL"
+APITday <- "221104"
+APIC <- "C00"
+APIrange <- "/range/1/day/"
+APIday <- "2022-12-07/2022-12-07"
+APIlim <- "?adjusted=true&sort=asc&limit=50000&api"
+APIkey <- "Key=CBQouP6k8C92g2XWhofZB5PCGgxI6lOk"
+
+ldays <- c("230106",  "230217", "230317", "230421", "230519", "230616", "230721", "230915")
+
+Kprice <-c(130, 135, 140, 145, 150)
+```
+
+test
+```{r}
+ldays <- c("240417")
+Kprice <-c(5278)
+```
+
+enkelt test
+```{r}
+API<- paste(APIstock, APITday=ldays[1], APIC, as.character(as.integer(Kprice[1]*1000)), APIrange, APIday, APIlim, APIkey, sep = "")
+raw <- jsonlite::fromJSON(API)
+      vw <- raw$results$vw
+      t <- raw$results$t
+```
+
+
+for loop gathering (testing) (prøv error skipping med "tryCatch funktionen)
+```{r}
+for (i in 1:length(ldays)) {
+    for (j in 1:length(Kprice)){
+      API<- paste(APIstock, APITday=ldays[i], APIC, as.character(as.integer(Kprice[j]*1000)), APIrange, APIday, APIlim, APIkey, sep = "")
+      raw <- jsonlite::fromJSON(API)
+      skip_to_next <- FALSE
+      tryCatch({
+        vw <- raw$results$vw},
+        error=function(e){
+          Sys.sleep(20)
+          skip_to_next <<- TRUE})
+      if(skip_to_next) next
+      else 
+        t <- raw$results$t
+      assign(paste0("T", ldays[i], "K", Kprice[j]), data.frame(vw,t))
+      Sys.sleep(20)
+    }
+  }
+```
+
+Create list
+```{r}
+df_list <- list(T230106K130, T230106K135, T230106K140, T230106K145, T230106K150, T230217K130, T230217K135, T230217K140, T230217K145, T230217K150, T230317K130, T230317K135, T230317K140, T230317K145, T230317K150, T230421K130, T230421K135, T230421K140, T230421K145, T230421K150, T230519K130, T230519K135, T230519K140, T230519K145, T230519K150, T230616K130, T230616K135, T230616K140, T230616K145, T230616K150, T230721K130, T230721K140, T230721K145, T230721K150, T230915K130, T230915K135, T230915K140, T230915K145, T230915K150)
+```
+
+Gammel manuel for loop
+```{r}
+API<- paste(APIstock, APITday, APIC, as.character(as.integer(startprice*1000)),APIrange, APIday, APIlim, APIkey, sep = "")
+raw <- jsonlite::fromJSON(API)
+
+vw <- raw$results$vw
+t <- raw$results$t
+assign(paste0("df", startprice), data.frame(vw,t))
+startprice <- startprice + 1
+```
+
+gammel liste
+```{r}
+df_list <- list(df100, df105, df110, df115, df120, df125, df126, df127, df128, df129, df130, df131, df132, df133, df134, df135, df136, df137, df138, df139, df140, df141, df142, df143, df144, df145, df146, df147, df148, df149, df150, df155, df160, df165, df170, df175, df180, df185, df190, df195, df200)
+```
+
+```{r}
+df <- Reduce(function(x,y) merge(x,y, all = TRUE, by = "t"), df_list)
+```
+
+```{r}
+name_list <- list("T230106K130", "T230106K135", "T230106K140", "T230106K145", "T230106K150", "T230217K130", "T230217K135", "T230217K140", "T230217K145", "T230217K150", "T230317K130", "T230317K135", "T230317K140", "T230317K145", "T230317K150", "T230421K130", "T230421K135", "T230421K140", "T230421K145", "T230421K150", "T230519K130", "T230519K135", "T230519K140", "T230519K145", "T230519K150", "T230616K130", "T230616K135", "T230616K140", "T230616K145", "T230616K150", "T230721K130", "T230721K140", "T230721K145", "T230721K150", "T230915K130", "T230915K135", "T230915K140", "T230915K145", "T230915K150")
+```
+
+
+```{r}
+for (i in 1:length(name_list)) {
+  colnames(df)[i+1] <- name_list[i]
+}
+```
+
+
+```{r}
+write.csv(df, "Ny-data-2.csv")
+```
+
+hent call filen
+```{r}
+#call <- read.csv("/Users/christiantaulbjerg/Documents/GitHub/F2024/CallApple.csv")
+call <- read.csv("C:\\Users\\Bruger\\Desktop\\F2024\\CallApple.csv")
+```
+
+
+STOCK
+```{r}
+SAPI <- "https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2022-12-05/2022-12-05?adjusted=true&sort=asc&limit=50000&apiKey=CBQouP6k8C92g2XWhofZB5PCGgxI6lOk"
+Sraw <- jsonlite::fromJSON(SAPI)
+```
+
+Find riskfree rate r
+```{r}
+#Fetch Treasury bond yields from FRED (Federal Reserve Economic Data)
+getSymbols("DGS3MO", src = "FRED", from = "2022-10-11", to = "2022-11-03")
+
+
+#Extract data
+treasury_yield <- DGS3MO[, "DGS3MO"]
+
+#Calculate risk-free rate as the 10-year Treasury bond yield
+risk_free_rate <- tail(treasury_yield, 1) / 100
+
+print(risk_free_rate)
+r <- 0.0425
+```
+
+```{r}
+S <- Sraw$results$c
+t <- Sraw$results$t
+S0 <- data.frame(S,t)
+```
+
+
+```{r}
+for (i in 1:length(df$t)) {
+  df$S0[i] <- S
+}
+```
+
+```{r}
+FULLdf <- left_join(call, S0, by = "t")
+```
+
+
+```{r}
+write.csv(FULLdf, "Data_w_S_and_r.csv")
+```
+
+```{r}
+for (i in 1:length(FULLdf$t)) {
+  FULLdf[i,2] <- (FULLdf[i,2] - 1664890200000)/31536000000
+}
+```
+
+```{r}
+write.csv(FULLdf, "Data_t_in_min.csv")
+```
+
