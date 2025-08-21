@@ -1,9 +1,72 @@
-In this project, I investigated the pricing of European call options with a focus on AAPL stock, using two popular option pricing models: the Black-Scholes (B&S) model and the Heston model. The aim was to compare the pricing accuracy and hedging effectiveness of both models, particularly in the context of Delta-neutral hedging.
+# ⚡ Delta Hedging in a Stochastic Volatility Framework
 
-To calibrate the Heston model, I used the Levenberg-Marquardt algorithm and tested different initial parameter guesses. The performance of each model was assessed by evaluating metrics such as Mean Squared Error (MSE) and Mean Absolute Percentage Error (MAPE), both for option prices and implied volatilities. Results showed that with better initial values, the Heston model clearly outperformed the B&S model, due to its ability to account for stochastic volatility.
+</div>
 
-I further analyzed the Greeks (Delta, Gamma, Vega) for both models across various strike prices and maturities. The Heston model generally showed higher sensitivity to changes in the underlying asset price, particularly in Delta and Vega values. These findings helped to interpret the risk profiles and responsiveness of options priced under each model.
+## 📘 Overview
 
-In the final part of the project, I conducted a Delta hedging analysis on an AAPL call option (strike price $140, maturity on February 17, 2023). I recalculated Delta values daily from December 5 to 21, 2022, using both pricing models. I then constructed and backtested Delta-neutral portfolios based on each model, evaluating their hedging performance through absolute hedging error, portfolio variance, and R² values from regression analysis. The results showed that while both models effectively reduced portfolio risk, the Heston model demonstrated superior performance in terms of lower hedging error and variance.
+This project investigates the pricing of European Call options, with a specific focus on AAPL. We compare two popular option pricing models:
 
-Overall, this project combines option pricing theory, numerical optimization, and practical hedging analysis, highlighting the advantages of using more advanced stochastic models in financial risk management.
+- **Black & Scholes (B&S) Model** – assumes constant volatility.
+- **Heston Model** – incorporates stochastic volatility, allowing more flexibility in capturing market patterns.
+
+## 🎯 Objectives
+
+- Compare the pricing accuracy of B&S and Heston models.
+- Evaluate the impact of initial parameter guesses on Heston model calibration.
+- Analyze the Greeks (∆, Γ, Θ, Vega) under both models.
+- Test the effectiveness of Delta hedging in reducing portfolio risk.
+
+## 🧪 Methods
+
+- **Model Calibration**:
+  - Used the Levenberg-Marquardt algorithm for parameter fitting in the Heston model.
+  - Adjusted initial parameter guesses to minimize errors.
+- **Evaluation Metrics**:
+  - Mean Squared Error (MSE) for prices and implied volatility.
+  - Mean Absolute Percentage Error (MAPE).
+- **Greeks Analysis**:
+  - Calculated ∆, Γ, Θ, and Vega to understand option sensitivity.
+- **Hedging Effectiveness**:
+  - Implemented ∆-hedging for AAPL options and measured portfolio variance and absolute hedging error.
+
+## 📊 Key Findings
+
+### Model Performance
+
+| Metric       | Old Initial Values (Heston) | New Initial Values (Heston) | B&S Model |
+|-------------|------------------|------------------|-----------|
+| MSE Price    | 1.160            | 0.868            | 2.321     |
+| MSE IV       | 0.0024           | 0.0016           | 0.0021    |
+| MAPE Price   | 11.23%           | 9.07%            | 13.38%    |
+| MAPE IV      | 10.96%           | 8.61%            | 9.78%     |
+
+### Greeks Comparison
+  - **Delta (∆)**: Options are more sensitive under Heston compared to B&S.
+  - **Gamma (Γ)**: Differences between models shrink for larger maturities.
+  - **Theta (Θ)**: Heston has larger absolute values, especially for long-dated options.
+
+### Delta Hedging Effectiveness
+  - Tested a call option with strike $140 and maturity Feb 17, 2023.
+  - Observed ∆ changes when options transitioned ITM ↔ OTM.
+  - Hedged portfolio variance:
+    - Heston: 2.68
+    - B&S: 3.69
+  - Absolute hedging error:
+    - Heston: 19.34
+    - B&S: 23.27
+### Conclusion
+
+Heston provides better hedging performance due to its stochastic volatility framework, reducing both portfolio variance and hedging error compared to B&S.
+
+## 🔍 Insights
+
+- Initial parameter guesses strongly affect Heston calibration results.
+- Heston captures the volatility smile and stochastic behavior more accurately than B&S.
+- ∆ sensitivity is higher in Heston, which affects hedging strategies.
+- Delta hedging reduces risk effectively, with Heston outperforming B&S in variance reduction and error metrics.
+
+## 🌍 Implications
+
+- Stochastic volatility models (like Heston) provide more realistic option pricing for trading and risk management.
+- Careful calibration of model parameters is crucial for accurate option pricing and hedging.
+- Delta hedging remains an effective risk mitigation tool, especially when model assumptions reflect market dynamics.
